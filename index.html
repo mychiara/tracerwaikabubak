@@ -3,8 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <script>
-      // Otomatis redirect ke hasil build (dist) jika diakses lewat Apache Laragon / file system langsung (non-Vite)
-      if (!window.location.port && !window.location.pathname.includes('/dist/')) {
+      // Otomatis redirect ke hasil build (dist) jika diakses lewat Apache Laragon local (non-Vite)
+      if (
+        (window.location.hostname === 'localhost' || window.location.hostname.endsWith('.test') || window.location.hostname === '127.0.0.1') && 
+        !window.location.port && 
+        !window.location.pathname.includes('/dist/')
+      ) {
         window.location.href = './dist/index.html' + window.location.search + window.location.hash;
       }
     </script>
