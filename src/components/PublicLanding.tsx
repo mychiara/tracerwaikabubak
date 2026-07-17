@@ -309,8 +309,8 @@ export const PublicLanding: React.FC<PublicLandingProps> = ({
               <GraduationCap size={22} />
             </div>
             <div>
-              <span style={{ display: 'block', fontSize: '1.1rem', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.03em', lineHeight: 1 }}>SI-TRACER</span>
-              <span style={{ display: 'block', fontSize: '9px', fontWeight: 700, color: '#00B9AD', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: '3px', lineHeight: 1.4 }}>Prodi D3 Keperawatan Waikabubak<br/>Poltekkes Kemenkes Kupang</span>
+              <span style={{ display: 'block', fontSize: '1.1rem', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.03em', lineHeight: 1 }}>SI-MITRA CARE</span>
+              <span style={{ display: 'block', fontSize: '9px', fontWeight: 700, color: '#00B9AD', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: '3px', lineHeight: 1.4 }}>Sistem Informasi Kemitraan & Tracer Keperawatan<br/>D3 Keperawatan Waikabubak</span>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -763,7 +763,7 @@ export const PublicLanding: React.FC<PublicLandingProps> = ({
               <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, #00B9AD, #60C0D0)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
                 <GraduationCap size={18} />
               </div>
-              <span style={{ fontSize: '1.1rem', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>SI-TRACER & KEMITRAAN</span>
+              <span style={{ fontSize: '1.1rem', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>SI-MITRA CARE</span>
             </div>
             <p style={{ fontSize: '13px', lineHeight: 1.75, maxWidth: '280px' }}>Poltekkes Kemenkes Kupang<br/>Prodi D3 Keperawatan Waikabubak</p>
           </div>

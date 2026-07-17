@@ -284,8 +284,8 @@ function App() {
         <div className="sidebar-brand">
           <div className="sidebar-logo">🏥</div>
           <div>
-            <h1 className="sidebar-title">Tracer Study, Kemitraan dan UKOM</h1>
-            <span className="sidebar-subtitle">Prodi D3 Keperawatan Waikabubak</span>
+            <h1 className="sidebar-title">SI-MITRA CARE</h1>
+            <span className="sidebar-subtitle">Sistem Informasi Kemitraan & Tracer Keperawatan</span>
           </div>
           {isMobileMenuOpen && (
             <button className="sidebar-close-btn" onClick={() => setIsMobileMenuOpen(false)}>
