@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panduan Deploy - Portal Tracer Study Sumba</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts Outfit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+    }
+    code, pre {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .gradient-bg {
+      background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05) 0%, rgba(20, 21, 23, 0.05) 90%);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+    .dark-glass-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 min-h-screen gradient-bg leading-relaxed">
+
+  <!-- Header Banner -->
+  <header class="w-full py-12 px-6 bg-gradient-to-r from-indigo-700 via-indigo-600 to-purple-600 text-white relative overflow-hidden shadow-lg">
+    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    <div class="max-w-5xl mx-auto relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
+          <i data-lucide="rocket" class="w-4 h-4 text-amber-300"></i> Deployment Guide
+        </div>
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Panduan Deploy Aplikasi</h1>
+        <p class="text-indigo-100 text-sm max-w-xl">Panduan langkah-demi-langkah terlengkap untuk mendeploy Portal Tracer Study Sumba dari server lokal hingga cloud hosting.</p>
+      </div>
+      <div class="flex items-center gap-3 shrink-0">
+        <a href="index.html" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
+          <i data-lucide="home" class="w-4 h-4"></i> Halaman Utama
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      
+      <!-- Sticky Sidebar Menu -->
+      <aside class="lg:col-span-1">
+        <div class="sticky top-6 p-5 glass-card rounded-2xl space-y-4 shadow-sm border border-slate-200/50">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Daftar Isi</h3>
+          <nav class="space-y-1">
+            <a href="#persiapan" class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-lg text-indigo-600 bg-indigo-50/80 transition-all">
+              <i data-lucide="shield-check" class="w-4 h-4"></i> Persiapan Awal
+            </a>
+            <a href="#database" class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+              <i data-lucide="database" class="w-4 h-4"></i> Setup Database
+            </a>
+            <a href="#konfigurasi" class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+              <i data-lucide="settings" class="w-4 h-4"></i> Variabel Lingkungan
+            </a>
+            <a href="#build" class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+              <i data-lucide="cpu" class="w-4 h-4"></i> Kompilasi / Build
+            </a>
+            <a href="#hosting" class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+              <i data-lucide="server" class="w-4 h-4"></i> Cloud Hosting
+            </a>
+            <a href="#cpanel" class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+              <i data-lucide="globe" class="w-4 h-4"></i> cPanel & Laragon
+            </a>
+            <a href="#troubleshooting" class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+              <i data-lucide="help-circle" class="w-4 h-4"></i> Troubleshooting
+            </a>
+            <a href="#keepalive" class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+              <i data-lucide="shield-alert" class="w-4 h-4"></i> Supabase Keep-Alive
+            </a>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- Main Contents -->
+      <section class="lg:col-span-3 space-y-12">
+
+        <!-- 1. Persiapan Awal -->
+        <article id="persiapan" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-200/50 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">1</span>
+            <h2 class="text-xl font-extrabold text-slate-900">Persiapan Kebutuhan Sistem</h2>
+          </div>
+          <p class="text-sm text-slate-600">Sebelum memulai, pastikan lingkungan server Anda memiliki perangkat lunak berikut terinstal:</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-2">
+              <div class="flex items-center gap-2 text-sm font-bold text-slate-800">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i> Node.js (v18 ke atas)
+              </div>
+              <p class="text-xs text-slate-500">Digunakan untuk melakukan instalasi paket dependensi dan melakukan kompilasi bundel production React Vite.</p>
+            </div>
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-2">
+              <div class="flex items-center gap-2 text-sm font-bold text-slate-800">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i> Akun Supabase (Gratis)
+              </div>
+              <p class="text-xs text-slate-500">Sebagai backend database cloud terintegrasi untuk menyimpan data alumni, kuesioner, dan dokumen kerjasama.</p>
+            </div>
+          </div>
+        </article>
+
+        <!-- 2. Setup Database Supabase -->
+        <article id="database" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-200/50 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">2</span>
+            <h2 class="text-xl font-extrabold text-slate-900">Pengaturan Database Supabase</h2>
+          </div>
+          <p class="text-sm text-slate-600">Sistem ini dilengkapi dengan integrasi database Supabase. Jika Supabase offline, aplikasi otomatis beralih ke penyimpanan LocalStorage.</p>
+          <div class="space-y-4 pt-2">
+            <div class="space-y-2 text-sm">
+              <div class="font-bold text-slate-800">Langkah Setup Supabase:</div>
+              <ol class="list-decimal list-inside space-y-2 text-slate-600 text-xs pl-2">
+                <li>Buka dashboard <a href="https://supabase.com" target="_blank" class="text-indigo-600 underline font-semibold">Supabase.com</a> dan buat proyek baru.</li>
+                <li>Setelah proyek selesai dibuat, masuk ke menu <strong>SQL Editor</strong> pada panel sebelah kiri.</li>
+                <li>Buat query SQL baru, salin seluruh isi file skema <code class="px-1.5 py-0.5 bg-slate-100 border rounded text-rose-500">supabase_schema.sql</code> yang ada di root direktori proyek ini, lalu klik <strong>Run</strong>.</li>
+                <li>Proses di atas akan otomatis membuat 4 tabel utama: <code class="font-semibold text-slate-700">alumni</code>, <code class="font-semibold text-slate-700">mitra_kerjasama</code>, <code class="font-semibold text-slate-700">pengguna_lulusan</code>, dan <code class="font-semibold text-slate-700">alumni_feedback</code>.</li>
+              </ol>
+            </div>
+
+            <!-- Code block schema info -->
+            <div class="bg-slate-900 text-slate-100 p-4 rounded-xl space-y-2 relative">
+              <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-2">
+                <span class="text-xs font-semibold text-slate-400">skema SQL Supabase</span>
+                <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">SQL</span>
+              </div>
+              <pre class="text-xs overflow-x-auto"><code>-- Schema: alumni, mitra_kerjasama, pengguna_lulusan, alumni_feedback
+-- Tabel dibuat dengan relasi UUID dan keamanan RLS dinonaktifkan
+-- Agar publik dapat melakukan registrasi/input feedback tracer study.</code></pre>
+            </div>
+          </div>
+        </article>
+
+        <!-- 3. Variabel Lingkungan -->
+        <article id="konfigurasi" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-200/50 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">3</span>
+            <h2 class="text-xl font-extrabold text-slate-900">Variabel Lingkungan (.env)</h2>
+          </div>
+          <p class="text-sm text-slate-600">Buat file baru bernama <code class="px-1.5 py-0.5 bg-slate-100 border rounded text-rose-500">.env</code> di root direktori proyek Anda untuk mengkoneksikan backend Supabase:</p>
+          
+          <div class="bg-slate-900 text-slate-100 p-5 rounded-xl space-y-2">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+              <span class="text-xs font-semibold text-slate-400">Isi Berkas .env</span>
+              <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">ENV</span>
+            </div>
+            <pre class="text-xs overflow-x-auto space-y-1"><code>VITE_SUPABASE_URL=https://nama-project-kamu.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzY...</code></pre>
+          </div>
+          <div class="p-4 bg-amber-50 border border-amber-500/20 text-amber-800 rounded-xl text-xs flex gap-3">
+            <i data-lucide="alert-triangle" class="w-5 h-5 shrink-0 text-amber-600"></i>
+            <div>
+              <span class="font-bold block">PENTING!</span>
+              Pastikan Anda menggunakan prefiks <code class="font-bold">VITE_</code> pada nama variabel agar dapat dibaca oleh runtime kompilasi Vite pada sisi client.
+            </div>
+          </div>
+        </article>
+
+        <!-- 4. Build / Kompilasi -->
+        <article id="build" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-200/50 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">4</span>
+            <h2 class="text-xl font-extrabold text-slate-900">Langkah Kompilasi Produksi (Build)</h2>
+          </div>
+          <p class="text-sm text-slate-600">Lakukan instalasi dependensi modul Node dan kompilasi proyek menjadi file static HTML/JS/CSS:</p>
+          
+          <div class="space-y-4">
+            <div class="space-y-2">
+              <div class="text-xs font-semibold text-slate-500">1. Jalankan instalasi dependensi (hanya sekali):</div>
+              <div class="bg-slate-900 text-slate-100 p-3 rounded-lg text-xs font-mono">npm install</div>
+            </div>
+            <div class="space-y-2">
+              <div class="text-xs font-semibold text-slate-500">2. Jalankan proses compile build untuk production:</div>
+              <div class="bg-slate-900 text-slate-100 p-3 rounded-lg text-xs font-mono">npm run build</div>
+            </div>
+          </div>
+          <p class="text-xs text-slate-500">Setelah proses build selesai, direktori baru bernama <strong class="text-slate-800">"dist"</strong> akan terbuat di root folder Anda. Folder ini berisi static assets HTML, CSS, dan JS yang siap diletakkan di web server.</p>
+        </article>
+
+        <!-- 5. Cloud Hosting (GitHub & Netlify) -->
+        <article id="hosting" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-200/50 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">5</span>
+            <h2 class="text-xl font-extrabold text-slate-900">Deploy ke Netlify Terkoneksi GitHub</h2>
+          </div>
+          <p class="text-sm text-slate-600">Sesuai arsitektur modern, seluruh script ini disimpan di GitHub dan dideploy secara otomatis menggunakan Netlify:</p>
+          
+          <div class="space-y-4 pt-2">
+            <!-- Langkah 1: GitHub -->
+            <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-2 text-xs">
+              <div class="font-bold text-indigo-600 flex items-center gap-1.5"><i data-lucide="github" class="w-4 h-4"></i> Langkah 1: Push Project ke GitHub</div>
+              <ol class="list-decimal list-inside space-y-1.5 text-slate-600 pl-2">
+                <li>Inisialisasi git pada folder lokal: <code class="px-1.5 py-0.5 bg-slate-200 border rounded font-mono">git init</code></li>
+                <li>Buat repositori baru di GitHub (misalnya: <code class="font-semibold text-slate-700">tracer-study-sumba</code>).</li>
+                <li>Tambahkan semua berkas ke git staging: <code class="px-1.5 py-0.5 bg-slate-200 border rounded font-mono">git add .</code></li>
+                <li>Lakukan commit awal: <code class="px-1.5 py-0.5 bg-slate-200 border rounded font-mono">git commit -m "feat: inisialisasi portal tracer study"</code></li>
+                <li>Hubungkan repositori lokal ke GitHub dan push:
+                  <div class="bg-slate-900 text-slate-200 p-2.5 rounded-lg font-mono text-[10px] mt-2 space-y-1">
+                    git remote add origin https://github.com/username-kamu/tracer-study-sumba.git<br>
+                    git branch -M main<br>
+                    git push -u origin main
+                  </div>
+                </li>
+              </ol>
+            </div>
+
+            <!-- Langkah 2: Netlify -->
+            <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-2 text-xs">
+              <div class="font-bold text-indigo-600 flex items-center gap-1.5"><i data-lucide="chrome" class="w-4 h-4"></i> Langkah 2: Koneksi dan Deploy di Netlify</div>
+              <ol class="list-decimal list-inside space-y-1.5 text-slate-600 pl-2">
+                <li>Buka dashboard <a href="https://app.netlify.com" target="_blank" class="text-indigo-600 underline font-semibold">Netlify.com</a> dan masuk menggunakan akun GitHub Anda.</li>
+                <li>Pilih tombol <strong>"Add new site"</strong> lalu pilih opsi <strong>"Import an existing project"</strong>.</li>
+                <li>Pilih penyedia layanan Git: <strong>GitHub</strong>, lalu pilih repositori <code class="font-semibold text-slate-700">tracer-study-sumba</code> yang telah dibuat.</li>
+                <li>Pada bagian <strong>Build settings</strong>, pastikan konfigurasi berikut sudah sesuai:
+                  <ul class="list-disc list-inside pl-4 mt-1 font-semibold text-indigo-600">
+                    <li>Build command: <code class="font-mono bg-slate-200 px-1 py-0.5 rounded text-slate-700">npm run build</code></li>
+                    <li>Publish directory: <code class="font-mono bg-slate-200 px-1 py-0.5 rounded text-slate-700">dist</code></li>
+                  </ul>
+                </li>
+                <li>Masuk ke bagian <strong>Environment Variables</strong> di bawahnya, klik <strong>"Add variable"</strong> dan masukkan variabel berikut:
+                  <div class="bg-slate-900 text-slate-200 p-2.5 rounded-lg font-mono text-[10px] mt-2 space-y-1">
+                    VITE_SUPABASE_URL = [URL_SUPABASE_PROYEK_ANDA]<br>
+                    VITE_SUPABASE_ANON_KEY = [ANON_KEY_SUPABASE_PROYEK_ANDA]
+                  </div>
+                </li>
+                <li>Klik tombol <strong>"Deploy tracer-study-sumba"</strong>. Netlify akan mulai mengkompilasi dan mempublikasikan aplikasi Anda secara otomatis.</li>
+              </ol>
+            </div>
+
+            <!-- Langkah 3: Pengalihan Rute (Redirects) -->
+            <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-2 text-xs text-amber-900">
+              <div class="font-bold flex items-center gap-1.5"><i data-lucide="help-circle" class="w-4 h-4"></i> Konfigurasi Penanganan SPA (Single Page Application) Redirects</div>
+              <p class="text-amber-800">
+                Agar routing React Router bekerja lancar saat halaman di-refresh di Netlify, sistem ini telah dilengkapi berkas <code class="font-semibold bg-amber-100 px-1 rounded">public/_redirects</code> berisi:
+              </p>
+              <pre class="bg-slate-900 text-slate-200 p-2 rounded text-[10px] font-mono">/*    /index.html   200</pre>
+              <p class="text-amber-800">Berkas ini akan disalin ke folder <code class="font-semibold">dist</code> saat proses build dan memberitahu Netlify untuk mengalihkan seluruh rute URL kembali ke file utama <code class="font-semibold">index.html</code>.</p>
+            </div>
+          </div>
+        </article>
+
+        <!-- 6. cPanel & Laragon -->
+        <article id="cpanel" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-200/50 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">6</span>
+            <h2 class="text-xl font-extrabold text-slate-900">Deploy ke cPanel Traditional & Laragon</h2>
+          </div>
+          <p class="text-sm text-slate-600">Jika Anda menggunakan web hosting konvensional (cPanel) atau server lokal (Laragon/XAMPP):</p>
+          
+          <div class="space-y-4">
+            <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-2 text-xs">
+              <div class="font-bold text-indigo-600 flex items-center gap-1.5"><i data-lucide="globe" class="w-4 h-4"></i> Deploy ke cPanel:</div>
+              <ol class="list-decimal list-inside space-y-1.5 text-slate-600 pl-2">
+                <li>Buka folder <code class="font-bold">dist</code> di komputer Anda setelah menjalankan <code class="font-mono">npm run build</code>.</li>
+                <li>Kompres seluruh isi folder <code class="font-bold">dist</code> menjadi satu berkas bernama <code class="font-bold">dist.zip</code>.</li>
+                <li>Buka cPanel hosting Anda, masuk ke **File Manager** dan buka direktori utama domain (<code class="font-bold">public_html</code>).</li>
+                <li>Unggah berkas <code class="font-bold">dist.zip</code> lalu ekstrak berkas tersebut langsung di dalam folder <code class="font-bold">public_html</code>.</li>
+                <li>Buat file bernama <code class="font-bold">.htaccess</code> di folder tersebut untuk mencegah error 404 saat halaman di-refresh:</li>
+              </ol>
+              <div class="bg-slate-900 text-slate-200 p-3 rounded-lg font-mono text-[10px] mt-2">
+                &lt;IfModule mod_rewrite.c&gt;<br>
+                &nbsp;&nbsp;RewriteEngine On<br>
+                &nbsp;&nbsp;RewriteBase /<br>
+                &nbsp;&nbsp;RewriteRule ^index\.html$ - [L]<br>
+                &nbsp;&nbsp;RewriteCond %{REQUEST_FILENAME} !-f<br>
+                &nbsp;&nbsp;RewriteCond %{REQUEST_FILENAME} !-d<br>
+                &nbsp;&nbsp;RewriteRule . /index.html [L]<br>
+                &lt;/IfModule&gt;
+              </div>
+            </div>
+
+            <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-2 text-xs">
+              <div class="font-bold text-indigo-600 flex items-center gap-1.5"><i data-lucide="server" class="w-4 h-4"></i> Deploy ke Laragon:</div>
+              <ol class="list-decimal list-inside space-y-1.5 text-slate-600 pl-2">
+                <li>Buka direktori instalasi Laragon Anda (biasanya di <code class="font-bold">C:\laragon\www\nama-folder</code>).</li>
+                <li>Salin seluruh berkas yang berada di dalam folder <code class="font-bold">dist</code> ke folder proyek Laragon Anda tersebut.</li>
+                <li>Akses domain lokal yang disediakan oleh Laragon (misalnya <code class="font-mono">http://nama-folder.test</code>).</li>
+              </ol>
+            </div>
+          </div>
+        </article>
+
+        <!-- 7. Troubleshooting -->
+        <article id="troubleshooting" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-200/50 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">7</span>
+            <h2 class="text-xl font-extrabold text-slate-900">Penyelesaian Masalah (Troubleshooting)</h2>
+          </div>
+          
+          <div class="space-y-4 text-xs">
+            <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-900 space-y-1">
+              <div class="font-bold">Masalah 1: Kenapa data kuesioner tidak terupdate ke Supabase?</div>
+              <p class="text-slate-600">Pastikan Anda sudah mengaktifkan izin tabel publik (tanpa RLS) atau telah menyalin schema pemicu SQL dengan benar. Jika terjadi kegagalan koneksi, data akan disimpan ke penyimpanan lokal web browser (LocalStorage).</p>
+            </div>
+            
+            <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-900 space-y-1">
+              <div class="font-bold">Masalah 2: Blank page / Error 404 ketika navigasi di-refresh di cPanel?</div>
+              <p class="text-slate-600">Hal ini wajar pada aplikasi Single Page Application (SPA). Buat berkas <code class="font-bold">.htaccess</code> seperti di Langkah 6 untuk memetakan seluruh rute navigasi kembali ke berkas <code class="font-bold">index.html</code>.</p>
+            </div>
+          </div>
+        </article>
+
+        <!-- 8. Supabase Keep-Alive -->
+        <article id="keepalive" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-200/50 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">8</span>
+            <h2 class="text-xl font-extrabold text-slate-900">Mencegah Hibernasi Database (Supabase Keep-Alive)</h2>
+          </div>
+          <p class="text-sm text-slate-600">
+            Layanan gratis (Free Tier) Supabase akan otomatis masuk ke mode jeda (hibernasi) jika tidak ada aktivitas query dalam waktu 7 hari. Untuk mencegah hal ini, sistem ini telah dilengkapi dengan workflow otomatis **GitHub Actions** yang akan melakukan ping query ringan sekali sehari secara otomatis.
+          </p>
+
+          <div class="space-y-4 pt-2">
+            <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-2 text-xs">
+              <div class="font-bold text-indigo-600 flex items-center gap-1.5"><i data-lucide="shield-check" class="w-4 h-4"></i> Konfigurasi Otomatis via GitHub Actions</div>
+              <p class="text-slate-600">
+                Berkas alur kerja sudah tersedia di folder <code class="font-semibold text-slate-700">.github/workflows/supabase-keepalive.yml</code>. Untuk mengaktifkannya, ikuti langkah berikut:
+              </p>
+              <ol class="list-decimal list-inside space-y-2 text-slate-600 pl-2 mt-2">
+                <li>Push proyek Anda ke repositori GitHub.</li>
+                <li>Buka halaman repositori Anda di GitHub, lalu klik tab <strong>Settings</strong> di menu atas.</li>
+                <li>Pada panel sebelah kiri, pilih <strong>Secrets and variables</strong> -&gt; klik <strong>Actions</strong>.</li>
+                <li>Klik tombol <strong>"New repository secret"</strong> dan tambahkan dua kunci rahasia berikut:
+                  <div class="bg-slate-900 text-slate-200 p-3 rounded-lg font-mono text-[10px] mt-2 space-y-1">
+                    Kunci 1:<br>
+                    Name: <code class="text-indigo-400 font-bold">VITE_SUPABASE_URL</code><br>
+                    Value: [Masukkan URL proyek Supabase Anda]<br><br>
+                    Kunci 2:<br>
+                    Name: <code class="text-indigo-400 font-bold">VITE_SUPABASE_ANON_KEY</code><br>
+                    Value: [Masukkan Anon Key proyek Supabase Anda]
+                  </div>
+                </li>
+                <li>Setelah disimpan, GitHub Actions akan menjalankan ping query otomatis setiap hari pada pukul 13:00 WITA. Anda juga bisa mengujinya secara manual dengan pergi ke tab <strong>Actions</strong> di repositori GitHub Anda, pilih workflow <strong>Supabase Keep Alive</strong>, lalu klik <strong>Run workflow</strong>.</li>
+              </ol>
+            </div>
+          </div>
+        </article>
+
+      </section>
+    </div>
+  </main>
+
+  <footer class="w-full py-8 text-center text-xs text-slate-400 border-t border-slate-200 mt-16 bg-white">
+    © 2026 by Masandigital.com - Portal Tracer Study Sumba. Data bersifat publik dan informatif.
+  </footer>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Smooth scroll navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        // Remove active class from all links
+        document.querySelectorAll('aside nav a').forEach(a => {
+          a.classList.remove('text-indigo-600', 'bg-indigo-50/80');
+          a.classList.add('text-slate-600', 'hover:bg-slate-50');
+        });
+
+        // Add active class to clicked link
+        this.classList.add('text-indigo-600', 'bg-indigo-50/80');
+        this.classList.remove('text-slate-600', 'hover:bg-slate-50');
+
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+  </script>
+</body>
+</html>
