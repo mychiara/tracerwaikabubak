@@ -284,7 +284,7 @@ function App() {
         <div className="sidebar-brand">
           <div className="sidebar-logo">🏥</div>
           <div>
-            <h1 className="sidebar-title">SI-MITRA CARE</h1>
+            <h1 className="sidebar-title">SI-MITRA CARE <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 500 }}>by masandigital.com</span></h1>
             <span className="sidebar-subtitle">Sistem Informasi Kemitraan & Tracer Keperawatan</span>
           </div>
           {isMobileMenuOpen && (

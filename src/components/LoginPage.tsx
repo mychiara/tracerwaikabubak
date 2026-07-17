@@ -70,7 +70,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           <div className="login-icon">🏥</div>
           <div>
             <h1 className="login-title">Portal Login</h1>
-            <p className="login-subtitle font-bold text-[10px]">SI-MITRA CARE</p>
+            <p className="login-subtitle font-bold text-[10px]">SI-MITRA CARE by masandigital.com</p>
           </div>
         </div>
 
