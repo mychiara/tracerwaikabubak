@@ -4,7 +4,7 @@ import type { MitraKerjasama } from '../data/mockData';
 
 // Admin credentials fallback
 const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'sumba2025';
+const ADMIN_PASS = 'Lovechiar4';
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -152,7 +152,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
         <div className="login-hint text-center bg-slate-50 dark:bg-slate-900/50 p-2.5 rounded-lg border border-color mt-4 text-[10px] space-y-1">
           <p className="font-bold text-slate-700 dark:text-slate-200">Kredensial Contoh:</p>
-          <p className="text-muted">🔑 Admin: <span className="font-semibold text-slate-800 dark:text-slate-200">admin / sumba2025</span></p>
+          <p className="text-muted">🔑 Admin: <span className="font-semibold text-slate-800 dark:text-slate-200">admin / Lovechiar4</span></p>
           <p className="text-muted">🏥 RSUD Waikabubak: <span className="font-semibold text-slate-800 dark:text-slate-200">rswaikabubak / mitra123</span></p>
           <p className="text-muted">🏥 RS Lindimara: <span className="font-semibold text-slate-800 dark:text-slate-200">rslindimara / mitra123</span></p>
         </div>
