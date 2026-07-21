@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { getSupabaseCredentials, updateSupabaseCredentials, isSupabaseConnected } from '../utils/db';
-import { Database, Key, AlertTriangle, Cloud } from 'lucide-react';
+import { getSupabaseCredentials, updateSupabaseCredentials, isSupabaseConnected, apiSeedDatabase } from '../utils/db';
+import { Database, Key, AlertTriangle, Cloud, Play, RefreshCw } from 'lucide-react';
 
 export const SupabasePanel: React.FC = () => {
   const [creds, setCreds] = useState(getSupabaseCredentials());
@@ -9,6 +9,8 @@ export const SupabasePanel: React.FC = () => {
   const [isConnected, setIsConnected] = useState(isSupabaseConnected());
   
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'failed'>('idle');
+  const [seedLoading, setSeedLoading] = useState(false);
+  const [seedResult, setSeedResult] = useState<{ success: boolean; message: string } | null>(null);
 
   const handleSave = () => {
     try {
@@ -30,6 +32,25 @@ export const SupabasePanel: React.FC = () => {
     setCreds(getSupabaseCredentials());
     setIsConnected(isSupabaseConnected());
     setSaveStatus('idle');
+    setSeedResult(null);
+  };
+
+  const handleSeed = async (reset: boolean) => {
+    const confirmMsg = reset 
+      ? 'Apakah Anda yakin ingin MENGHAPUS SEMUA DATA di database Supabase dan mengisi ulang dengan data awal?' 
+      : 'Apakah Anda yakin ingin mengisi data awal ke database Supabase?';
+    if (!window.confirm(confirmMsg)) return;
+
+    setSeedLoading(true);
+    setSeedResult(null);
+    try {
+      const res = await apiSeedDatabase(reset);
+      setSeedResult(res);
+    } catch (e: any) {
+      setSeedResult({ success: false, message: e.message || 'Gagal melakukan seeding.' });
+    } finally {
+      setSeedLoading(false);
+    }
   };
 
   const envFileContent = `VITE_SUPABASE_URL=${urlInput || 'YOUR_SUPABASE_PROJECT_URL'}
@@ -143,6 +164,62 @@ VITE_SUPABASE_ANON_KEY=${keyInput || 'YOUR_SUPABASE_ANON_KEY'}`;
               <span>Eksekusi terlebih dahulu skrip <strong>supabase_schema.sql</strong> di SQL Editor Supabase Console sebelum menyambungkan aplikasi.</span>
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Database Seeding section */}
+      <div className="glass p-6 space-y-4">
+        <h3 className="text-sm font-bold flex items-center gap-2 border-bottom pb-2">
+          <Database size={16} />
+          Seeding & Sinkronisasi Data Awal (Mock Data)
+        </h3>
+        <div className="text-xs space-y-2 text-muted leading-relaxed">
+          <p>
+            Jika Anda baru saja menghubungkan database Supabase baru, seluruh tabel akan berada dalam keadaan kosong (mitra kosong, alumni kosong, dll.).
+            Gunakan tombol di bawah ini untuk mengisi database Supabase Anda dengan data awal (Mock Data) secara otomatis agar aplikasi tidak kosong.
+          </p>
+          <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-300 p-3 rounded-lg flex gap-2 items-start">
+            <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+            <div>
+              <span className="font-bold block">PENTING: Masalah RLS & Kolom Database Mismatch!</span>
+              <span>Pastikan Anda telah menjalankan perintah SQL migrasi terbaru (atau tabel schema ter-update) di panel Supabase SQL Editor sebelum melakukan seeding. Jika database Anda masih menggunakan schema lama, proses seeding dapat gagal karena ketidakcocokan kolom.</span>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap gap-3 pt-2">
+            <button 
+              className="btn btn-outline text-xs font-bold py-2 px-4 rounded-xl flex items-center gap-2 border-color hover:bg-slate-100 dark:hover:bg-slate-900"
+              onClick={() => handleSeed(false)}
+              disabled={seedLoading || !isConnected}
+            >
+              <Play size={14} className="text-teal-500" />
+              Isi Data Awal (Masukkan Data Baru)
+            </button>
+            <button 
+              className="btn btn-outline text-xs font-bold py-2 px-4 rounded-xl flex items-center gap-2 text-rose-600 border-rose-500/20 hover:bg-rose-50"
+              onClick={() => handleSeed(true)}
+              disabled={seedLoading || !isConnected}
+            >
+              <RefreshCw size={14} className={seedLoading ? 'animate-spin' : ''} />
+              Reset & Isi Data Awal Baru (Hapus Semua Dulu)
+            </button>
+          </div>
+          
+          {seedLoading && (
+            <div className="text-xs font-bold text-slate-500 animate-pulse pt-2">
+              ⏳ Sedang melakukan proses seeding ke Supabase, harap tunggu...
+            </div>
+          )}
+
+          {seedResult && (
+            <div className={`p-3 text-xs rounded-lg font-bold border mt-2 ${
+              seedResult.success 
+                ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' 
+                : 'bg-rose-500/10 text-rose-600 border-rose-500/20'
+            }`}>
+              {seedResult.success ? '✅ ' : '❌ '} {seedResult.message}
+            </div>
+          )}
         </div>
       </div>
     </div>

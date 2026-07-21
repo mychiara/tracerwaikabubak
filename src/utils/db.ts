@@ -162,6 +162,29 @@ export const apiDeleteAlumni = async (id: string): Promise<boolean> => {
   return true;
 };
 
+export const apiDeleteAllAlumni = async (): Promise<boolean> => {
+  if (supabaseClient) {
+    try {
+      const { error } = await supabaseClient
+        .from('alumni')
+        .delete()
+        .neq('id', '');
+      
+      if (!error) {
+        setLocalData('tracer_alumni', []);
+        return true;
+      }
+      console.error('Supabase delete all error', error);
+    } catch (e) {
+      console.error('Supabase connection error', e);
+    }
+  }
+
+  setLocalData('tracer_alumni', []);
+  return true;
+};
+
+
 
 // --- Mitra Kerjasama API ---
 export const apiGetMitra = async (): Promise<MitraKerjasama[]> => {
@@ -421,3 +444,39 @@ export const apiAddAlumniFeedback = async (feedback: Omit<AlumniFeedback, 'id' |
   setLocalData('tracer_alumni_feedback', updated);
   return newFeedback;
 };
+
+export const apiSeedDatabase = async (reset: boolean = false): Promise<{ success: boolean; message: string }> => {
+  if (!supabaseClient) {
+    return { success: false, message: 'Koneksi Supabase tidak aktif. Silakan hubungkan terlebih dahulu.' };
+  }
+  try {
+    if (reset) {
+      await supabaseClient.from('alumni_feedback').delete().neq('id', '');
+      await supabaseClient.from('pengguna_lulusan').delete().neq('id', '');
+      await supabaseClient.from('mitra_kerjasama').delete().neq('id', '');
+      await supabaseClient.from('alumni').delete().neq('id', '');
+    }
+
+    // Seed mitra_kerjasama
+    const { error: errMitra } = await supabaseClient.from('mitra_kerjasama').insert(initialMitra);
+    if (errMitra) throw new Error(`Gagal mengisi mitra_kerjasama: ${errMitra.message}`);
+
+    // Seed alumni
+    const { error: errAlumni } = await supabaseClient.from('alumni').insert(initialAlumni);
+    if (errAlumni) throw new Error(`Gagal mengisi alumni: ${errAlumni.message}`);
+
+    // Seed pengguna_lulusan
+    const { error: errFeedback } = await supabaseClient.from('pengguna_lulusan').insert(initialFeedback);
+    if (errFeedback) throw new Error(`Gagal mengisi pengguna_lulusan: ${errFeedback.message}`);
+
+    // Seed alumni_feedback
+    const { error: errAlumniFeedback } = await supabaseClient.from('alumni_feedback').insert(initialAlumniFeedback);
+    if (errAlumniFeedback) throw new Error(`Gagal mengisi alumni_feedback: ${errAlumniFeedback.message}`);
+
+    return { success: true, message: 'Database berhasil di-seed!' };
+  } catch (e: any) {
+    console.error('Error seeding database', e);
+    return { success: false, message: e.message || 'Gagal melakukan seeding.' };
+  }
+};
+

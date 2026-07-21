@@ -7,13 +7,15 @@ interface AlumniTracerPanelProps {
   onAdd: (a: Omit<Alumni, 'id' | 'created_at'>) => Promise<Alumni>;
   onUpdate: (a: Alumni) => Promise<Alumni>;
   onDelete: (id: string) => Promise<boolean>;
+  onDeleteAll: () => Promise<boolean>;
 }
 
 export const AlumniTracerPanel: React.FC<AlumniTracerPanelProps> = ({
   alumni,
   onAdd,
   onUpdate,
-  onDelete
+  onDelete,
+  onDeleteAll
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -28,6 +30,15 @@ export const AlumniTracerPanel: React.FC<AlumniTracerPanelProps> = ({
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAlumni, setEditingAlumni] = useState<Alumni | null>(null);
+  const [isDeleteAllModalOpen, setIsDeleteAllModalOpen] = useState(false);
+  const [isConfirmChecked, setIsConfirmChecked] = useState(false);
+
+  const handleConfirmDeleteAll = async () => {
+    if (!isConfirmChecked) return;
+    await onDeleteAll();
+    setIsDeleteAllModalOpen(false);
+    setIsConfirmChecked(false);
+  };
 
   // Form State
   const [formNama, setFormNama] = useState('');
@@ -188,15 +199,15 @@ export const AlumniTracerPanel: React.FC<AlumniTracerPanelProps> = ({
             nama: row.nama || 'Tanpa Nama',
             nim: row.nim || '-',
             tahun_lulus: Number(row.tahun_lulus) || 2024,
-            no_hp: row.no_hp || '-',
-            email: row.email || '-',
-            status_kerja: row.status_kerja as any || 'Bekerja',
-            nama_institusi: row.nama_institusi || '-',
-            wilayah_kerja: row.wilayah_kerja as any || 'Sumba Timur',
-            jabatan: row.jabatan || '-',
-            gaji_bulanan: row.gaji_bulanan as any || 'Rp 3.000.000 - Rp 5.000.000',
-            waktu_tunggu_bulan: Number(row.waktu_tunggu_bulan) || 3,
-            relevansi_kurikulum: row.relevansi_kurikulum as any || 'Relevan'
+            no_hp: row.no_hp || '',
+            email: row.email || '',
+            status_kerja: (row.status_kerja as any) || '',
+            nama_institusi: row.nama_institusi || '',
+            wilayah_kerja: (row.wilayah_kerja as any) || '',
+            jabatan: row.jabatan || '',
+            gaji_bulanan: (row.gaji_bulanan as any) || '',
+            waktu_tunggu_bulan: row.waktu_tunggu_bulan !== undefined && row.waktu_tunggu_bulan !== '' ? Number(row.waktu_tunggu_bulan) : 0,
+            relevansi_kurikulum: (row.relevansi_kurikulum as any) || ''
           });
           successCount++;
         } catch (err) {
@@ -214,9 +225,7 @@ export const AlumniTracerPanel: React.FC<AlumniTracerPanelProps> = ({
 
   const downloadCSVTemplate = () => {
     const csvContent = 
-      "nama,nim,tahun_lulus,no_hp,email,status_kerja,nama_institusi,wilayah_kerja,jabatan,gaji_bulanan,waktu_tunggu_bulan,relevansi_kurikulum\n" +
-      "Rambu Ana,P07420120101,2024,08123456789,rambu@mail.com,Bekerja,Rumah Sakit Kristen Lindimara,Sumba Timur,Perawat IGD,Rp 3.000.000 - Rp 5.000.000,3,Relevan\n" +
-      "Lodu Sumba,P07420120102,2023,08123456780,lodu@mail.com,Mencari Kerja,-,Sumba Barat,-,< Rp 3.000.000,5,Cukup Relevan";
+      "nama,nim,tahun_lulus,no_hp,email,status_kerja,nama_institusi,wilayah_kerja,jabatan,gaji_bulanan,waktu_tunggu_bulan,relevansi_kurikulum\n";
     
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -336,6 +345,18 @@ export const AlumniTracerPanel: React.FC<AlumniTracerPanelProps> = ({
             style={{ display: 'none' }} 
           />
           
+          {alumni.length > 0 && (
+            <button 
+              type="button" 
+              className="btn btn-outline text-xs flex items-center gap-1 text-rose-600 border-rose-500/20 hover:bg-rose-50 dark:hover:bg-rose-950/10"
+              onClick={() => setIsDeleteAllModalOpen(true)}
+              title="Hapus Semua Data Alumni"
+            >
+              <Trash2 size={14} />
+              Hapus Semua
+            </button>
+          )}
+
           <button 
             type="button" 
             className="btn btn-outline text-xs flex items-center gap-1 text-slate-700 dark:text-slate-200 border-color"
@@ -399,57 +420,77 @@ export const AlumniTracerPanel: React.FC<AlumniTracerPanelProps> = ({
                       </div>
                     </td>
                     <td>
-                      <div className="text-xs flex flex-col gap-0.5 text-muted">
-                        <span className="flex items-center gap-1"><Mail size={12} /> {a.email}</span>
-                        <span className="flex items-center gap-1"><Phone size={12} /> {a.no_hp}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`badge ${
-                        a.status_kerja === 'Bekerja'
-                          ? 'badge-success'
-                          : a.status_kerja === 'Wirausaha'
-                            ? 'badge-primary'
-                            : a.status_kerja === 'Studi Lanjut'
-                              ? 'badge-warning'
-                              : 'badge-danger'
-                      }`}>
-                        {a.status_kerja}
-                      </span>
-                    </td>
-                    <td>
-                      {a.status_kerja === 'Bekerja' || a.status_kerja === 'Wirausaha' ? (
-                        <div>
-                          <div className="font-semibold text-xs flex items-center gap-1">
-                            <Briefcase size={12} className="text-muted" />
-                            {a.nama_institusi}
-                          </div>
-                          <span className="text-[10px] text-muted flex items-center gap-0.5 mt-0.5">
-                            <MapPin size={10} />
-                            {a.wilayah_kerja} ({a.jabatan})
-                          </span>
+                      {a.email || a.no_hp ? (
+                        <div className="text-xs flex flex-col gap-0.5 text-muted">
+                          {a.email && <span className="flex items-center gap-1"><Mail size={12} /> {a.email}</span>}
+                          {a.no_hp && <span className="flex items-center gap-1"><Phone size={12} /> {a.no_hp}</span>}
                         </div>
                       ) : (
                         <span className="text-xs text-muted italic">-</span>
                       )}
                     </td>
                     <td>
-                      <span className="text-xs font-mono font-bold flex items-center">
-                        <DollarSign size={12} className="text-emerald-500" />
-                        {a.gaji_bulanan}
-                      </span>
+                      {a.status_kerja ? (
+                        <span className={`badge ${
+                          a.status_kerja === 'Bekerja'
+                            ? 'badge-success'
+                            : a.status_kerja === 'Wirausaha'
+                              ? 'badge-primary'
+                              : a.status_kerja === 'Studi Lanjut'
+                                ? 'badge-warning'
+                                : 'badge-danger'
+                        }`}>
+                          {a.status_kerja}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted italic">-</span>
+                      )}
+                    </td>
+                    <td>
+                      {(a.status_kerja === 'Bekerja' || a.status_kerja === 'Wirausaha') && (a.nama_institusi || a.wilayah_kerja || a.jabatan) ? (
+                        <div>
+                          {a.nama_institusi && (
+                            <div className="font-semibold text-xs flex items-center gap-1">
+                              <Briefcase size={12} className="text-muted" />
+                              {a.nama_institusi}
+                            </div>
+                          )}
+                          {(a.wilayah_kerja || a.jabatan) && (
+                            <span className="text-[10px] text-muted flex items-center gap-0.5 mt-0.5">
+                              <MapPin size={10} />
+                              {a.wilayah_kerja || '-'}{a.jabatan ? ` (${a.jabatan})` : ''}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted italic">-</span>
+                      )}
+                    </td>
+                    <td>
+                      {a.gaji_bulanan ? (
+                        <span className="text-xs font-mono font-bold flex items-center">
+                          <DollarSign size={12} className="text-emerald-500" />
+                          {a.gaji_bulanan}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted italic">-</span>
+                      )}
                     </td>
                     <td>
                       <div className="flex flex-col gap-1 items-start">
-                        <span className={`badge ${
-                          a.relevansi_kurikulum === 'Sangat Relevan' || a.relevansi_kurikulum === 'Relevan'
-                            ? 'badge-success'
-                            : a.relevansi_kurikulum === 'Cukup Relevan'
-                              ? 'badge-warning'
-                              : 'badge-danger'
-                        } text-[10px] py-0.5 px-2`}>
-                          {a.relevansi_kurikulum}
-                        </span>
+                        {a.relevansi_kurikulum ? (
+                          <span className={`badge ${
+                            a.relevansi_kurikulum === 'Sangat Relevan' || a.relevansi_kurikulum === 'Relevan'
+                              ? 'badge-success'
+                              : a.relevansi_kurikulum === 'Cukup Relevan'
+                                ? 'badge-warning'
+                                : 'badge-danger'
+                          } text-[10px] py-0.5 px-2`}>
+                            {a.relevansi_kurikulum}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted italic">-</span>
+                        )}
                         {a.tahun_lulus_ukom ? (
                           <span className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold border border-teal-200 dark:border-teal-800 rounded px-1.5 py-0.5">
                             UKOM: {a.tahun_lulus_ukom}
@@ -771,6 +812,71 @@ export const AlumniTracerPanel: React.FC<AlumniTracerPanelProps> = ({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete All Confirmation Modal */}
+      {isDeleteAllModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content glass max-w-md">
+            <div className="modal-header border-bottom">
+              <h3 className="text-lg font-bold text-rose-600 flex items-center gap-2">
+                <Trash2 size={20} />
+                Hapus Semua Data Alumni
+              </h3>
+              <button 
+                className="btn btn-outline p-1.5 rounded-full" 
+                onClick={() => { setIsDeleteAllModalOpen(false); setIsConfirmChecked(false); }}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body space-y-4">
+              <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-600 rounded-xl text-xs space-y-2">
+                <p className="font-bold flex items-center gap-1.5">
+                  ⚠️ Peringatan Penting:
+                </p>
+                <p className="leading-relaxed">
+                  Tindakan ini bersifat <strong>permanen</strong> dan tidak dapat dibatalkan. Seluruh data alumni (<strong>{alumni.length} data</strong>) akan dihapus secara permanen dari database.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5 p-1">
+                <input 
+                  type="checkbox" 
+                  id="confirm-delete-all-checkbox"
+                  className="mt-1 cursor-pointer w-4.5 h-4.5 accent-rose-600 rounded"
+                  style={{ minWidth: '18px' }}
+                  checked={isConfirmChecked}
+                  onChange={(e) => setIsConfirmChecked(e.target.checked)}
+                />
+                <label 
+                  htmlFor="confirm-delete-all-checkbox"
+                  className="text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer select-none"
+                >
+                  Saya yakin dan setuju untuk menghapus semua data alumni secara permanen dari sistem.
+                </label>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button 
+                type="button" 
+                className="btn btn-outline text-xs" 
+                onClick={() => { setIsDeleteAllModalOpen(false); setIsConfirmChecked(false); }}
+              >
+                Batal
+              </button>
+              <button 
+                type="button" 
+                className={`btn text-xs ${isConfirmChecked ? 'btn-danger' : 'btn-outline text-slate-400 border-slate-200 cursor-not-allowed'}`}
+                disabled={!isConfirmChecked}
+                onClick={handleConfirmDeleteAll}
+              >
+                <Trash2 size={14} />
+                Ya, Hapus Semua
+              </button>
+            </div>
           </div>
         </div>
       )}

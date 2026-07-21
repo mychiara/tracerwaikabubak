@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS public.alumni (
     gaji_bulanan TEXT DEFAULT '-',
     waktu_tunggu_bulan INTEGER DEFAULT 0,
     relevansi_kurikulum TEXT DEFAULT '-',
+    tahun_lulus_ukom TEXT DEFAULT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
@@ -31,6 +32,8 @@ CREATE TABLE IF NOT EXISTS public.mitra_kerjasama (
     file_url TEXT DEFAULT '-',
     status TEXT NOT NULL,
     password TEXT DEFAULT 'mitra123',
+    username_login TEXT DEFAULT NULL,
+    password_login TEXT DEFAULT 'mitra123',
     mou_history JSONB DEFAULT '[]'::jsonb,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
@@ -57,9 +60,14 @@ CREATE TABLE IF NOT EXISTS public.pengguna_lulusan (
 CREATE TABLE IF NOT EXISTS public.alumni_feedback (
     id TEXT PRIMARY KEY,
     alumni_id TEXT NOT NULL,
-    ipk NUMERIC(3,2) DEFAULT 0.00,
-    pekerjaan_sesuai TEXT DEFAULT '-',
-    saran_kurikulum TEXT DEFAULT '-',
+    nim TEXT DEFAULT '-',
+    nama TEXT DEFAULT '-',
+    tahun_lulus INTEGER DEFAULT 0,
+    kualitas_pembelajaran INTEGER DEFAULT 5,
+    fasilitas_pembelajaran INTEGER DEFAULT 5,
+    relevansi_kurikulum INTEGER DEFAULT 5,
+    layanan_akademik INTEGER DEFAULT 5,
+    saran_prodi TEXT DEFAULT '-',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
@@ -68,3 +76,10 @@ ALTER PUBLICATION supabase_realtime ADD TABLE public.alumni;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.mitra_kerjasama;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.pengguna_lulusan;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.alumni_feedback;
+
+-- Disable Row Level Security (RLS) to ensure direct API access via Anon Key works without complex policy setup
+-- (Anda juga dapat mengaktifkan RLS dan membuat policy read/write jika diperlukan untuk produksi)
+ALTER TABLE public.alumni DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mitra_kerjasama DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.pengguna_lulusan DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.alumni_feedback DISABLE ROW LEVEL SECURITY;

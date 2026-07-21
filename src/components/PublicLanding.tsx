@@ -265,6 +265,46 @@ export const PublicLanding: React.FC<PublicLandingProps> = ({
                f.pengembangan_diri_nilai) / 7, 0) / feedback.length).toFixed(1)
     : '0';
 
+  const statsByYear = React.useMemo(() => {
+    // Get unique graduation years sorted descending
+    const years = Array.from(new Set(alumni.map(a => a.tahun_lulus))).sort((a, b) => b - a);
+    
+    return years.map(year => {
+      const yearAlumni = alumni.filter(a => a.tahun_lulus === year);
+      const total = yearAlumni.length;
+      
+      const bekerjaWirausaha = yearAlumni.filter(a => a.status_kerja === 'Bekerja' || a.status_kerja === 'Wirausaha').length;
+      const bekerjaPct = total > 0 ? ((bekerjaWirausaha / total) * 100).toFixed(1) : '0';
+      
+      const studiLanjut = yearAlumni.filter(a => a.status_kerja === 'Studi Lanjut').length;
+      const mencariKerja = yearAlumni.filter(a => a.status_kerja === 'Mencari Kerja' || (a.status_kerja as any) === '').length;
+      
+      // Average wait time
+      const employedWithWait = yearAlumni.filter(a => 
+        (a.status_kerja === 'Bekerja' || a.status_kerja === 'Wirausaha') && 
+        a.waktu_tunggu_bulan !== undefined && a.waktu_tunggu_bulan !== null
+      );
+      const avgWaitTime = employedWithWait.length > 0
+        ? (employedWithWait.reduce((acc, a) => acc + (a.waktu_tunggu_bulan || 0), 0) / employedWithWait.length).toFixed(1)
+        : '-';
+        
+      // Relevansi Kurikulum (Sangat Relevan & Relevan)
+      const relevan = yearAlumni.filter(a => a.relevansi_kurikulum === 'Sangat Relevan' || a.relevansi_kurikulum === 'Relevan').length;
+      const relevanPct = total > 0 ? ((relevan / total) * 100).toFixed(1) : '0';
+      
+      return {
+        year,
+        total,
+        bekerjaWirausaha,
+        bekerjaPct,
+        studiLanjut,
+        mencariKerja,
+        avgWaitTime,
+        relevanPct
+      };
+    });
+  }, [alumni]);
+
 
 
 
@@ -543,6 +583,109 @@ export const PublicLanding: React.FC<PublicLandingProps> = ({
                 <div style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 500 }}>{s.sub}</div>
               </div>
             ))}
+          </div>
+
+          {/* Table of Graduates by Year */}
+          <div style={{ 
+            marginTop: '40px', 
+            background: '#fff', 
+            borderRadius: '24px', 
+            border: '1px solid rgba(0,185,173,0.15)', 
+            boxShadow: '0 10px 30px rgba(0,185,173,0.06)', 
+            overflow: 'hidden' 
+          }}>
+            <div style={{ 
+              padding: '20px 28px', 
+              background: 'linear-gradient(135deg, #00B9AD08, #60C0D008)', 
+              borderBottom: '1px solid rgba(0,185,173,0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px'
+            }}>
+              <div style={{ 
+                width: '36px', 
+                height: '36px', 
+                borderRadius: '10px', 
+                background: 'rgba(0,185,173,0.1)', 
+                color: '#00B9AD', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center' 
+              }}>
+                <GraduationCap size={18} />
+              </div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                Detail Statistik Lulusan Berdasarkan Angkatan (Tahun Lulus)
+              </h3>
+            </div>
+            
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <th style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 700, color: '#475569' }}>Tahun Lulus</th>
+                    <th style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 700, color: '#475569' }}>Jumlah Alumni</th>
+                    <th style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 700, color: '#475569' }}>Terserap (Kerja/Wirausaha)</th>
+                    <th style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 700, color: '#475569' }}>Studi Lanjut</th>
+                    <th style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 700, color: '#475569' }}>Mencari Kerja</th>
+                    <th style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 700, color: '#475569' }}>Rata Waktu Tunggu</th>
+                    <th style={{ padding: '16px 24px', fontSize: '13px', fontWeight: 700, color: '#475569' }}>Relevansi Kurikulum</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {statsByYear.length > 0 ? (
+                    statsByYear.map((row, idx) => (
+                      <tr key={idx} style={{ 
+                        borderBottom: idx < statsByYear.length - 1 ? '1px solid #f1f5f9' : 'none',
+                        transition: 'background 0.2s'
+                      }}
+                        onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <td style={{ padding: '16px 24px', fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>
+                          Angkatan {row.year}
+                        </td>
+                        <td style={{ padding: '16px 24px', fontSize: '14px', fontWeight: 700, color: '#334155' }}>
+                          {row.total} Lulusan
+                        </td>
+                        <td style={{ padding: '16px 24px', fontSize: '14px', color: '#334155' }}>
+                          <span style={{ fontWeight: 700, color: '#10b981' }}>{row.bekerjaWirausaha}</span>
+                          <span style={{ fontSize: '11px', color: '#64748b', marginLeft: '6px', background: '#ecfdf5', padding: '2px 8px', borderRadius: '9999px', fontWeight: 600 }}>
+                            {row.bekerjaPct}%
+                          </span>
+                        </td>
+                        <td style={{ padding: '16px 24px', fontSize: '14px', fontWeight: 600, color: '#334155' }}>
+                          {row.studiLanjut} Lulusan
+                        </td>
+                        <td style={{ padding: '16px 24px', fontSize: '14px', fontWeight: 600, color: '#ef4444' }}>
+                          {row.mencariKerja} Lulusan
+                        </td>
+                        <td style={{ padding: '16px 24px', fontSize: '14px', color: '#334155' }}>
+                          {row.avgWaitTime !== '-' ? (
+                            <span>
+                              <span style={{ fontWeight: 700 }}>{row.avgWaitTime}</span>
+                              <span style={{ fontSize: '11px', color: '#64748b', marginLeft: '4px' }}>bulan</span>
+                            </span>
+                          ) : (
+                            <span style={{ color: '#94a3b8' }}>-</span>
+                          )}
+                        </td>
+                        <td style={{ padding: '16px 24px', fontSize: '14px', color: '#334155' }}>
+                          <span style={{ fontWeight: 700, color: '#00B9AD' }}>{row.relevanPct}%</span>
+                          <span style={{ fontSize: '11px', color: '#64748b', marginLeft: '6px' }}>Relevan</span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={7} style={{ padding: '32px', textAlign: 'center', color: '#94a3b8', fontSize: '14px' }}>
+                        Belum ada data statistik lulusan
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>

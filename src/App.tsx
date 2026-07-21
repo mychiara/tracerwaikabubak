@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense, useMemo } from 'react';
 import {
-  apiGetAlumni, apiAddAlumni, apiUpdateAlumni, apiDeleteAlumni,
+  apiGetAlumni, apiAddAlumni, apiUpdateAlumni, apiDeleteAlumni, apiDeleteAllAlumni,
   apiGetMitra, apiAddMitra, apiUpdateMitra, apiDeleteMitra,
   apiGetFeedback, apiAddFeedback, apiUpdateFeedback,
   apiGetAlumniFeedback, apiAddAlumniFeedback
@@ -13,7 +13,7 @@ import {
   LayoutDashboard, Map, GraduationCap, FileText,
   MessageSquare, BarChart3, Sun, Moon, Bell,
   Menu, X, LogOut, Globe, BookOpen, Info, ClipboardList,
-  Award, Briefcase
+  Award, Briefcase, Database
 } from 'lucide-react';
 
 // Lazy loaded components for optimized loading speed
@@ -163,6 +163,11 @@ function App() {
     if (res) setAlumni(prev => prev.filter(item => item.id !== id));
     return res;
   };
+  const handleDeleteAllAlumni = async () => {
+    const res = await apiDeleteAllAlumni();
+    if (res) setAlumni([]);
+    return res;
+  };
   const handleAddMitra = async (m: Omit<MitraKerjasama, 'id' | 'created_at'>) => {
     const res = await apiAddMitra(m);
     setMitra(prev => [res, ...prev]);
@@ -204,6 +209,7 @@ function App() {
     { id: 'analisis', label: 'Analisis & Kurikulum', icon: BarChart3 },
     { id: 'ukom', label: 'Analisis UKOM', icon: Award },
     { id: 'jabatan', label: 'Analisis Jabatan', icon: Briefcase },
+    { id: 'supabase', label: 'Integrasi Supabase', icon: Database },
     { id: 'panduan', label: 'Panduan Sistem', icon: BookOpen },
     { id: 'about', label: 'Tentang Aplikasi', icon: Info },
   ];
@@ -446,7 +452,7 @@ function App() {
               )}
               {activeTab === 'alumni' && (
                 <AlumniTracerPanel alumni={alumni} onAdd={handleAddAlumni}
-                  onUpdate={handleUpdateAlumni} onDelete={handleDeleteAlumni} />
+                  onUpdate={handleUpdateAlumni} onDelete={handleDeleteAlumni} onDeleteAll={handleDeleteAllAlumni} />
               )}
               {activeTab === 'feedback' && (
                 <FeedbackPenggunaPanel feedback={feedback} onAdd={handleAddFeedback} />
